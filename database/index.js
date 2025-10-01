@@ -30,8 +30,8 @@ if (process.env.NODE_ENV == "development") {
     },
   };
 } else {
-  Pool = new Pool({
+  Pool = new pool({
     connectionString: process.env.DATABASE_URL,
   });
-  module.exports = pool;
 }
+module.exports = pool;
