@@ -184,12 +184,23 @@ body {
 
 .site-footer {
   text-align: center;
-  padding: 1rem;
+  padding: 1rem 0;
   background: var(--primary);
   color: var(--text);
+  font-size: 0.9rem;
   margin-top: 2rem;
 }
 
+.site-footer .footer-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.site-footer .tagline {
+  font-style: italic;
+  margin-top: 0.5rem;
+  color: #aaa;
+}
 /* =========================================
    MEDIA QUERIES 
 ========================================= */
@@ -233,4 +244,50 @@ body {
   .features {
     flex-direction: row;
   }
+}
+
+/* Inventory Grid Layout */
+.inventory-grid ul {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.inventory-grid li {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inventory-grid li:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.inventory-grid img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.inventory-grid h2,
+.inventory-grid p {
+  margin: 0.75rem 1rem;
+}
+
+.inventory-grid h2 {
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.inventory-grid p {
+  font-size: 1rem;
+  color: #666;
 }
