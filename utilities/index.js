@@ -6,7 +6,6 @@ const Util = {};
  ************************** */
 Util.getNav = async function (req, res, next) {
   let data = await invModel.getClassifications();
-  console.log(data);
   let list = "<ul>";
   list += '<li><a href="/" title="Home page">Home</a></li>';
   data.rows.forEach((row) => {
@@ -27,17 +26,13 @@ Util.getNav = async function (req, res, next) {
 
 /* ************************
  * Middleware for handling errors
- * Wrap other function in this for
- * General error handling
- * ************************ */
+ ************************ */
 Util.handleErrors = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
-module.exports = Util;
-
 /* ************************
  * Build the classification view HTML
- * ************************ */
+ ************************ */
 Util.buildClassificationGrid = async function (data) {
   let grid;
   if (data.length > 0) {
@@ -51,7 +46,7 @@ Util.buildClassificationGrid = async function (data) {
         vehicle.inv_make +
         " " +
         vehicle.inv_model +
-        'details"><img src="' +
+        ' details"><img src="' +
         vehicle.inv_thumbnail +
         '" alt="Image of ' +
         vehicle.inv_make +
@@ -83,7 +78,41 @@ Util.buildClassificationGrid = async function (data) {
     });
     grid += "</ul>";
   } else {
-    grid += '<p class="notice">Sorry, no matching vehicles could be found.</p>';
+    grid = '<p class="notice">Sorry, no matching vehicles could be found.</p>';
   }
   return grid;
+};
+
+/* ************************
+ * Build a single vehicle detail view
+ ************************ */
+Util.buildVehicleDetailView = function (vehicle) {
+  const priceFormatted = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(vehicle.inv_price);
+
+  const mileageFormatted = new Intl.NumberFormat("en-US").format(
+    vehicle.inv_miles
+  );
+
+  return `
+    <section class="vehicle-detail">
+      <img src="${vehicle.inv_image}" alt="${vehicle.inv_make} ${vehicle.inv_model}" />
+      <h1>${vehicle.inv_make} ${vehicle.inv_model} (${vehicle.inv_year})</h1>
+      <p><strong>Price:</strong> ${priceFormatted}</p>
+      <p><strong>Mileage:</strong> ${mileageFormatted} miles</p>
+      <p>${vehicle.inv_description}</p>
+    </section>
+  `;
+};
+
+/* ************************
+ * Export all utils
+ ************************ */
+module.exports = {
+  getNav: Util.getNav,
+  handleErrors: Util.handleErrors,
+  buildClassificationGrid: Util.buildClassificationGrid,
+  buildVehicleDetailView: Util.buildVehicleDetailView,
 };

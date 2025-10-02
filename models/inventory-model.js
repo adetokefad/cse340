@@ -28,4 +28,14 @@ async function getInventoryByClassificationId(classification_id) {
   }
 }
 
-module.exports = { getClassifications, getInventoryByClassificationId };
+async function getInventoryById(inv_id) {
+  const sql = `SELECT * FROM public.inventory WHERE inv_id = $1`;
+  const result = await db.query(sql, [inv_id]);
+  return result.rows[0] || null;
+}
+
+module.exports = {
+  getClassifications,
+  getInventoryByClassificationId,
+  getInventoryById,
+};

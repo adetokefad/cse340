@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <main>
+      <section class="vehicle-detail">
+        <img
+          src="<%= vehicle.inv_image %>"
+          alt="<%= vehicle.inv_make %> <%= vehicle.inv_model %>"
+        />
+        <h2><%= vehicle.inv_make %> <%= vehicle.inv_model %></h2>
+        <p>Year: <%= vehicle.inv_year %></p>
+        <p>Price: ₦<%= vehicle.inv_price.toLocaleString() %></p>
+        <p><%= vehicle.inv_description %></p>
+      </section>
+    </main>
+  </body>
+</html>

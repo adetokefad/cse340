@@ -48,6 +48,27 @@ app.use(async (req, res, next) => {
   next({ status: 404, message: "Sorry, we appear to have lost that page." });
 });
 
+// 404 handler
+app.use(async (req, res, next) => {
+  const nav = await utilities.getNav();
+  res.status(404).render("errors/error", {
+    title: "404 - Page Not Found",
+    message: "Sorry, this page does not exist.",
+    nav,
+  });
+});
+
+// 500 handler
+app.use(async (err, req, res, next) => {
+  const nav = await utilities.getNav();
+  console.error(err);
+  res.status(err.status || 500).render("errors/error", {
+    title: "Server Error",
+    message: "Something went wrong on our side.",
+    nav,
+  });
+});
+
 /* ***********************
  * Express Error Handler
  * Place after all other middleware
