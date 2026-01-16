@@ -1,4 +1,9 @@
-<% const d = new Date(); let year = d.getFullYear() %>
-<footer>
-  <p class="copyright">&copy ; <%= year %>, CSE 340 App</p>
+<footer class="site-footer" role="contentinfo">
+  <div class="wrap">
+    <p>&copy; <span id="year"></span>, CSE 340 App</p>
+  </div>
+  <script>
+    // Non-blocking year injection
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </footer>
