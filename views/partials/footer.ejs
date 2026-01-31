@@ -1,9 +1,9 @@
-<footer class="site-footer" role="contentinfo">
-  <div class="wrap">
-    <p>&copy; <span id="year"></span>, CSE 340 App</p>
-  </div>
+<% const d = new Date(); let year = d.getFullYear(); %>
+<footer>
+  <p>
+    &copy; <%= year %>, CSE 340 APP | <a href="/error/test">Trigger Error</a>
+  </p>
   <script>
-    // Non-blocking year injection
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </footer>
