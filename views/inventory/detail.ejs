@@ -1,0 +1,12 @@
+<div class="vehicle-container">
+  <%- vehicleHTML %> 
+
+  <% if (locals.accountData) { %>
+  <form action="/account/wishlist/add" method="post">
+    <input type="hidden" name="inv_id" value="<%= vehicle.inv_id %>">
+    <button type="submit">Add to Wishlist</button>
+  </form>
+<% } %>
+
+  <p><a href="/" class="home-link">Return to Homepage</a></p>
+</div>

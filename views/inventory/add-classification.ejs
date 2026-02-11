@@ -1,0 +1,41 @@
+<div class="add-classification-container" role="main">
+  <h1>Add New Classification</h1>
+  <% if (typeof messages !== 'undefined' && (messages.error || messages.success)) { %>
+  <div class="flash-message">
+    <% if (messages.error) { %>
+    <ul class="error">
+      <% messages.error.forEach(msg => { %>
+      <li><%= msg %></li>
+      <% }) %>
+    </ul>
+    <% } %> <% if (messages.success) { %>
+    <ul class="success">
+      <% messages.success.forEach(msg => { %>
+      <li><%= msg %></li>
+      <% }) %>
+    </ul>
+    <% } %>
+  </div>
+  <% } %> <% if (typeof errors !== 'undefined' && errors) { %>
+  <ul class="notice">
+    <% errors.array().forEach(error => { %>
+    <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+  <% } %>
+  <form action="/inv/add-classification" method="POST" novalidate>
+    <div class="form-group">
+      <label for="classification_name">Classification Name</label>
+      <input
+        type="text"
+        id="classification_name"
+        name="classification_name"
+        placeholder="Enter classification name (no spaces or special chars)"
+        pattern="[A-Za-z0-9]+"
+        title="Use only letters and numbers, no spaces or special characters"
+        required
+      />
+    </div>
+    <button type="submit">Add Classification</button>
+  </form>
+</div>

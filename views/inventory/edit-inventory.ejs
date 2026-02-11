@@ -1,0 +1,134 @@
+<div class="add-inventory-container">
+  <h1>Add New Inventory</h1>
+  <% if (typeof messages !== 'undefined' && (messages.error ||
+  messages.success)) { %>
+  <div class="flash-message">
+    <% if (messages.error) { %>
+    <ul class="error">
+      <% messages.error.forEach(msg => { %>
+      <li><%= msg %></li>
+      <% }) %>
+    </ul>
+    <% } %> <% if (messages.success) { %>
+    <ul class="success">
+      <% messages.success.forEach(msg => { %>
+      <li><%= msg %></li>
+      <% }) %>
+    </ul>
+    <% } %>
+  </div>
+  <% } %> <% if (typeof errors !== 'undefined' && errors) { %>
+  <ul class="notice">
+    <% errors.array().forEach(error => { %>
+    <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+  <% } %>
+  <form id="updateForm" action="/inv/update" method="post">
+    <input type="hidden" name="inv_id" value="<%= inv_id %>" />
+    <div>
+      <label for="classification_id">Classification:</label>
+      <%- classificationSelect %>
+    </div>
+    <div>
+      <label for="inv_make">Make:</label>
+      <input
+        type="text"
+        id="inv_make"
+        name="inv_make"
+        value="<%= locals.inv_make || '' %>"
+        required
+      />
+    </div>
+    <div>
+      <label for="inv_model">Model:</label>
+      <input
+        type="text"
+        id="inv_model"
+        name="inv_model"
+        value="<%= locals.inv_model || '' %>"
+        required
+      />
+    </div>
+    <div>
+      <label for="inv_year">Year:</label>
+      <input
+        type="number"
+        id="inv_year"
+        name="inv_year"
+        value="<%= locals.inv_year || '' %>"
+        required
+      />
+    </div>
+    <div>
+      <label for="inv_description">Description:</label>
+      <textarea id="inv_description" name="inv_description" required>
+<%= locals.inv_description || '' %></textarea
+      >
+    </div>
+    <div>
+      <label for="inv_image">Image Path:</label>
+      <input
+        type="text"
+        id="inv_image"
+        name="inv_image"
+        value="<%= locals.inv_image || '' %>"
+        required
+      />
+    </div>
+    <div>
+      <label for="inv_thumbnail">Thumbnail Path:</label>
+      <input
+        type="text"
+        id="inv_thumbnail"
+        name="inv_thumbnail"
+        value="<%= locals.inv_thumbnail || '' %>"
+        required
+      />
+    </div>
+    <div>
+      <label for="inv_price">Price:</label>
+      <input
+        type="number"
+        id="inv_price"
+        name="inv_price"
+        value="<%= locals.inv_price || '' %>"
+        step="0.01"
+        required
+      />
+    </div>
+    <div>
+      <label for="inv_miles">Miles:</label>
+      <input
+        type="number"
+        id="inv_miles"
+        name="inv_miles"
+        value="<%= locals.inv_miles || '' %>"
+        required
+      />
+    </div>
+    <div>
+      <label for="inv_color">Color:</label>
+      <input
+        type="text"
+        id="inv_color"
+        name="inv_color"
+        value="<%= locals.inv_color || '' %>"
+        required
+      />
+    </div>
+    <button type="submit" disabled>Update Vehicle</button>
+  <input type="hidden" name="inv_id" value="<%= locals.inv_id %>">
+</form>
+</div>
+<script src="../../js/inv-update.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("inv_image").value = decodeURIComponent(
+      document.getElementById("inv_image").value
+    );
+    document.getElementById("inv_thumbnail").value = decodeURIComponent(
+      document.getElementById("inv_thumbnail").value
+    );
+  });
+</script>
