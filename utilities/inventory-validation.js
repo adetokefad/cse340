@@ -39,14 +39,9 @@ validate.inventoryRules = () => {
       .escape()
       .notEmpty()
       .withMessage("Description is required."),
-    body("inv_image")
-      .trim()
-      .escape()
-      .notEmpty()
-      .withMessage("Image path is required."),
+    body("inv_image").trim().notEmpty().withMessage("Image path is required."),
     body("inv_thumbnail")
       .trim()
-      .escape()
       .notEmpty()
       .withMessage("Thumbnail path is required."),
     body("inv_price")
@@ -94,7 +89,9 @@ validate.checkInventoryData = async (req, res, next) => {
       errors,
       title: "Add Inventory",
       nav,
-      classificationList: await utilities.buildClassificationList(),
+      classificationList: await utilities.buildClassificationList(
+        req.body.classification_id,
+      ),
       ...req.body, // Sticky fields
     });
     return;
