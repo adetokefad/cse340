@@ -48,5 +48,34 @@ router.post(
   utilities.handleErrors(invController.addInventory),
 );
 
+// Route to get inventory by classification as JSON (for management page)
+router.get(
+  "/getInventory/:classification_id",
+  utilities.handleErrors(invController.getInventoryJSON),
+);
+
+// Route to build edit inventory view
+router.get(
+  "/edit/:inv_id",
+  utilities.handleErrors(invController.editInventoryView),
+);
+
+// Route to process inventory update
+router.post(
+  "/update",
+  invValidate.inventoryRules(),
+  invValidate.checkUpdateData,
+  utilities.handleErrors(invController.updateInventory),
+);
+
+// Route to build delete confirmation view
+router.get(
+  "/delete/:inv_id",
+  utilities.handleErrors(invController.buildDeleteConfirm),
+);
+
+// Route to process inventory deletion
+router.post("/delete", utilities.handleErrors(invController.executeDelete));
+
 // Export module
 module.exports = router;

@@ -1,0 +1,20 @@
+<h2>Delete Confirmation</h2>
+<% if (errors) { %>
+  <ul class="error">
+    <% errors.forEach(error => { %>
+      <li><%= error %></li>
+    <% }); %>
+  </ul>
+<% } %>
+<p>Are you sure you want to delete the following vehicle?</p>
+<p>
+  <strong>Make:</strong> <%= inv_make %><br>
+  <strong>Model:</strong> <%= inv_model %><br>
+  <strong>Year:</strong> <%= inv_year %><br>
+  <strong>Price:</strong> $<%= inv_price %>
+</p>
+<form method="POST" action="/inv/delete">
+  <input type="hidden" name="inv_id" value="<%= inv_id %>">
+  <button type="submit" class="btn">Yes, Delete</button>
+  <a href="/inv/" class="btn">Cancel</a>
+</form>

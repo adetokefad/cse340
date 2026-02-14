@@ -1,0 +1,103 @@
+<main class="update-container">
+  <h1>Update Account</h1>
+  <% if (locals.messages && locals.messages.error) { %>
+    <div class="flash-message error">
+      <ul>
+        <% locals.messages.error.forEach(error => { %>
+          <li><%= error %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+  <% if (locals.messages && locals.messages.success) { %>
+    <div class="flash-message success">
+      <p><%= locals.messages.success %></p>
+    </div>
+  <% } %>
+
+  <form action="/account/update/<%= locals.accountData.account_id %>" method="post" novalidate onsubmit="return validateAccountForm()">
+    <input type="hidden" name="account_id" value="<%= locals.accountData.account_id %>">
+    <div class="form-group">
+      <label for="account_firstname">First Name *</label>
+      <input type="text" id="account_firstname" name="account_firstname" value="<%= locals.accountData.account_firstname %>" required>
+      <span id="fnameError" class="error"></span>
+    </div>
+    <div class="form-group">
+      <label for="account_lastname">Last Name *</label>
+      <input type="text" id="account_lastname" name="account_lastname" value="<%= locals.accountData.account_lastname %>" required>
+      <span id="lnameError" class="error"></span>
+    </div>
+    <div class="form-group">
+      <label for="account_email">Email *</label>
+      <input type="email" id="account_email" name="account_email" value="<%= locals.accountData.account_email %>" required>
+      <span id="emailError" class="error"></span>
+    </div>
+    <button type="submit">Update Account</button>
+  </form>
+
+  <!-- Change Password Form -->
+  <form action="/account/update/<%= locals.accountData.account_id %>/password" method="post" novalidate onsubmit="return validatePasswordForm()">
+    <input type="hidden" name="account_id" value="<%= locals.accountData.account_id %>">
+    <div class="form-group">
+      <label for="account_password">New Password *</label>
+      <input type="password" id="account_password" name="account_password" required 
+             pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
+             title="Password must be at least 8 characters with uppercase, lowercase, and a number">
+      <span id="passError" class="error"></span>
+      <p>Enter a new password (min 8 chars, 1 uppercase, 1 lowercase, 1 number) to change it.</p>
+    </div>
+    <button type="submit">Change Password</button>
+  </form>
+
+  <a href="/account/management" class="back-link">Back to Management</a>
+</main>
+
+<script>
+  // Client-side validation for account update form
+  function validateAccountForm() {
+    let isValid = true;
+    const fname = document.getElementById('account_firstname').value.trim();
+    const lname = document.getElementById('account_lastname').value.trim();
+    const email = document.getElementById('account_email').value.trim();
+    const fnameError = document.getElementById('fnameError');
+    const lnameError = document.getElementById('lnameError');
+    const emailError = document.getElementById('emailError');
+
+    fnameError.textContent = '';
+    lnameError.textContent = '';
+    emailError.textContent = '';
+
+    if (!fname) {
+      fnameError.textContent = 'First name is required';
+      isValid = false;
+    }
+    if (!lname) {
+      lnameError.textContent = 'Last name is required';
+      isValid = false;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      emailError.textContent = 'Valid email is required';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  // Client-side validation for password form
+  function validatePasswordForm() {
+    let isValid = true;
+    const pass = document.getElementById('account_password').value;
+    const passError = document.getElementById('passError');
+
+    passError.textContent = '';
+    if (!pass) {
+      passError.textContent = 'Password is required';
+      isValid = false;
+    } else if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(pass)) {
+      passError.textContent = 'Password must be at least 8 characters with uppercase, lowercase, and a number';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+</script>
