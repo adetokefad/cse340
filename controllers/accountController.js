@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 const utilities = require("../utilities");
 const accountModel = require("../models/account-model");
 const bcrypt = require("bcryptjs");
@@ -170,7 +172,9 @@ accountController.buildUpdate = async (req, res, next) => {
   });
 };
 
-// In accountController.js
+/* ****************************************
+ * Build account update view
+ * ************************************ */
 accountController.updateAccount = async (req, res, next) => {
   console.log("updateAccount called with req.body:", req.body);
   const { account_firstname, account_lastname, account_email } = req.body;
@@ -201,6 +205,9 @@ accountController.updateAccount = async (req, res, next) => {
   }
 };
 
+/* ****************************************
+ * Build update password view
+ * ************************************ */
 accountController.updatePassword = async (req, res, next) => {
   console.log("updatePassword called with req.body:", req.body);
   const { account_password } = req.body;
