@@ -15,6 +15,7 @@
 }
 
 body {
+  background: url("/images/site/checkerboard.jpg") center/cover no-repeat;
   padding: 40px 80px;
   position: relative;
 }
@@ -243,9 +244,7 @@ nav ul li a {
   overflow: hidden;
   text-decoration: none;
   color: #333;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 .vehicle-card:hover {
   transform: translateY(-5px);
@@ -743,6 +742,4 @@ input {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(13, 13, 13, 0.1);
 }
-.error {
-  color: var(--accent-color);
-}
+.error { color: var(--accent-color); }

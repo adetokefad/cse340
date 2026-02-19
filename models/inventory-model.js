@@ -6,6 +6,7 @@ async function getInventoryByClassificationId(classification_id) {
       "SELECT * FROM public.inventory WHERE classification_id = $1",
       [classification_id],
     );
+    console.log("Model query result rows:", result.rows);
     return result.rows;
   } catch (error) {
     console.error("Error in getInventoryByClassificationId:", error);
@@ -132,6 +133,7 @@ async function updateInventory(
       Number(classification_id),
       Number(inv_id),
     ]);
+    console.log("Update query result:", data.rows[0]);
     return data.rows[0];
   } catch (error) {
     console.error("model error: " + error);

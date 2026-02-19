@@ -1,0 +1,61 @@
+<main class="wishlist-container">
+  <h1><%= title %></h1>
+  
+  <!-- Flash Messages -->
+  <% if (locals.messages) { %>
+    <%= messages %>
+  <% } %>
+
+  <!-- Wishlist Items -->
+  <% if (wishlistItems && wishlistItems.length > 0) { %>
+    <div class="wishlist-items">
+      <% wishlistItems.forEach(item => { %>
+        <div class="wishlist-item">
+          <div class="item-info">
+            <h3><%= item.inv_year %> <%= item.inv_make %> <%= item.inv_model %></h3>
+            <p class="price">$<%= Number(item.inv_price).toLocaleString() %></p>
+          </div>
+          <div class="item-actions">
+            <a href="/inv/detail/<%= item.inv_id %>" class="btn-view">View Details</a>
+            <form action="/account/wishlist/remove/<%= item.inv_id %>" method="post" style="display:inline;">
+              <button type="submit" class="btn-remove">Remove</button>
+            </form>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+
+    <!-- Wishlist Summary -->
+    <div class="wishlist-summary">
+      <p class="total">
+        <strong>Total Value:</strong> 
+        $<%= wishlistItems.reduce((sum, item) => sum + Number(item.inv_price), 0).toLocaleString() %>
+      </p>
+      <p class="item-count">
+        <%= wishlistItems.length %> <%= wishlistItems.length === 1 ? 'vehicle' : 'vehicles' %> in your wishlist
+      </p>
+    </div>
+
+    <!-- Actions -->
+    <div class="wishlist-actions">
+      <a href="/" class="btn-continue">Continue Shopping</a>
+      <form action="/account/wishlist/clear" method="post" style="display:inline;" 
+            onsubmit="return confirm('Are you sure you want to clear your entire wishlist?');">
+        <button type="submit" class="btn-clear">Clear Wishlist</button>
+      </form>
+    </div>
+
+  <% } else { %>
+    <!-- Empty Wishlist -->
+    <div class="empty-wishlist">
+      <p>Your wishlist is empty.</p>
+      <p>Start adding vehicles you're interested in!</p>
+      <a href="/" class="btn-browse">Browse Vehicles</a>
+    </div>
+  <% } %>
+
+  <!-- Back Link -->
+  <p class="back-link">
+    <a href="/account/management">&larr; Back to Account</a>
+  </p>
+</main>

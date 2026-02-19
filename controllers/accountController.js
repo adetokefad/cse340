@@ -1,15 +1,15 @@
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
 const utilities = require("../utilities");
 const accountModel = require("../models/account-model");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
-const accountController = {};
+const accCont = {};
 
 /* ****************************************
  * Deliver login view
  * *************************************** */
-accountController.buildLogin = async (req, res, next) => {
+accCont.buildLogin = async (req, res, next) => {
   let nav = await utilities.getNav();
   res.render("account/login", {
     title: "Login",
@@ -20,7 +20,7 @@ accountController.buildLogin = async (req, res, next) => {
 /* ****************************************
  * Deliver registration view
  * *************************************** */
-accountController.buildRegister = async (req, res, next) => {
+accCont.buildRegister = async (req, res, next) => {
   let nav = await utilities.getNav();
   res.render("account/register", {
     title: "Register",
@@ -32,7 +32,7 @@ accountController.buildRegister = async (req, res, next) => {
 /* ****************************************
  * Process Registration
  * *************************************** */
-accountController.registerAccount = async (req, res) => {
+accCont.registerAccount = async (req, res) => {
   let nav = await utilities.getNav();
   const {
     account_firstname,
@@ -88,7 +88,7 @@ accountController.registerAccount = async (req, res) => {
 /* ****************************************
  * Process login request
  * ************************************ */
-accountController.loginAccount = async (req, res) => {
+accCont.loginAccount = async (req, res) => {
   let nav = await utilities.getNav();
   const { account_email, account_password } = req.body;
   const accountData = await accountModel.getAccountByEmail(account_email);
@@ -137,8 +137,8 @@ accountController.loginAccount = async (req, res) => {
 
 /* ****************************************
  * Build account management view
- * ************************************ */
-accountController.buildManagement = async (req, res, next) => {
+ * *************************************** */
+accCont.buildManagement = async (req, res, next) => {
   try {
     if (!res.locals.loggedin) {
       throw new Error("Please log in to view your account.");
@@ -156,7 +156,10 @@ accountController.buildManagement = async (req, res, next) => {
   }
 };
 
-accountController.buildUpdate = async (req, res, next) => {
+/* ****************************************
+ * Build account update view
+ * *************************************** */
+accCont.buildUpdate = async (req, res, next) => {
   const account_id = parseInt(req.params.account_id);
   if (
     account_id !== res.locals.accountData.account_id &&
@@ -165,76 +168,122 @@ accountController.buildUpdate = async (req, res, next) => {
     req.flash("error", "You can only update your own account.");
     return res.redirect("/account/update/" + res.locals.accountData.account_id);
   }
+
+  const nav = await utilities.getNav();
+  const accountData = await accountModel.getAccountById(account_id);
+
+  if (!accountData) {
+    req.flash("error", "Account not found.");
+    return res.redirect("/account/management");
+  }
+
   res.render("account/update", {
     title: "Update Account",
-    nav: await utilities.getNav(),
-    accountData: res.locals.accountData,
+    nav,
+    errors: null,
+    accountData,
   });
 };
 
 /* ****************************************
- * Build account update view
- * ************************************ */
-accountController.updateAccount = async (req, res, next) => {
+ * Process account update
+ * FIXED: Gets account_id from req.body (not req.params)
+ * FIXED: Uses accountModel (not accModel)
+ * FIXED: Updates JWT token after update
+ * *************************************** */
+accCont.updateAccount = async (req, res, next) => {
   console.log("updateAccount called with req.body:", req.body);
-  const { account_firstname, account_lastname, account_email } = req.body;
-  const account_id = parseInt(req.params.account_id);
+
+  // FIXED: Get from req.body, not req.params
+  const { account_id, account_firstname, account_lastname, account_email } =
+    req.body;
+  const accountIdInt = parseInt(account_id);
+
   try {
+    // Security check
     if (
-      account_id !== res.locals.accountData.account_id &&
+      accountIdInt !== res.locals.accountData.account_id &&
       res.locals.accountData.account_type !== "Admin"
     ) {
       throw new Error("Unauthorized to update this account");
     }
-    const updateData = await accModel.updateAccount(
-      account_id,
+
+    // FIXED: Use accountModel (not accModel)
+    const updateData = await accountModel.updateAccount(
+      accountIdInt,
       account_firstname,
       account_lastname,
       account_email,
     );
-    if (updateData.rowCount) {
+
+    if (updateData && updateData.rowCount) {
+      // FIXED: Update JWT token with fresh data
+      const updatedAccount = await accountModel.getAccountById(accountIdInt);
+      delete updatedAccount.account_password;
+      const accessToken = jwt.sign(
+        updatedAccount,
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: 3600 * 1000 },
+      );
+      const cookieOptions = { httpOnly: true, maxAge: 3600 * 1000 };
+      if (process.env.NODE_ENV !== "development") cookieOptions.secure = true;
+      res.cookie("jwt", accessToken, cookieOptions);
+
       req.flash("success", "Account updated successfully.");
+      res.locals.accountData = updatedAccount;
+      return res.redirect("/account/management");
     } else {
       req.flash("error", "Update failed.");
+      return res.redirect("/account/update/" + accountIdInt);
     }
-    res.redirect("/account/management");
   } catch (err) {
     console.error("updateAccount error:", err.stack);
     req.flash("error", err.message);
-    res.redirect("/account/update/" + account_id);
+    return res.redirect("/account/update/" + accountIdInt);
   }
 };
 
 /* ****************************************
- * Build update password view
- * ************************************ */
-accountController.updatePassword = async (req, res, next) => {
+ * Process password update
+ * FIXED: Gets account_id from req.body (not req.params)
+ * FIXED: Uses accountModel (not accModel)
+ * *************************************** */
+accCont.updatePassword = async (req, res, next) => {
   console.log("updatePassword called with req.body:", req.body);
-  const { account_password } = req.body;
-  const account_id = parseInt(req.params.account_id);
+
+  // FIXED: Get from req.body, not req.params
+  const { account_id, account_password } = req.body;
+  const accountIdInt = parseInt(account_id);
+
   try {
+    // Security check
     if (
-      account_id !== res.locals.accountData.account_id &&
+      accountIdInt !== res.locals.accountData.account_id &&
       res.locals.accountData.account_type !== "Admin"
     ) {
       throw new Error("Unauthorized to update this password");
     }
+
     const hashedPassword = await bcrypt.hash(account_password, 10);
-    const updateData = await accModel.updatePassword(
-      account_id,
+
+    // FIXED: Use accountModel (not accModel)
+    const updateData = await accountModel.updatePassword(
+      accountIdInt,
       hashedPassword,
     );
-    if (updateData.rowCount) {
+
+    if (updateData && updateData.rowCount) {
       req.flash("success", "Password updated successfully.");
+      return res.redirect("/account/management");
     } else {
       req.flash("error", "Password update failed.");
+      return res.redirect("/account/update/" + accountIdInt);
     }
-    res.redirect("/account/management");
   } catch (err) {
     console.error("updatePassword error:", err.stack);
     req.flash("error", err.message);
-    res.redirect("/account/update/" + account_id);
+    return res.redirect("/account/update/" + accountIdInt);
   }
 };
 
-module.exports = accountController;
+module.exports = accCont;

@@ -1,5 +1,6 @@
 <h1>Welcome to CSE Motors!</h1>
-<%- messages() %>
+<%- messages.error ? messages.error.join('<br />') : messages.success ?
+messages.success.join('<br />') : '' %>
 <div class="hero-section">
   <ul>
     <li>
@@ -7,7 +8,7 @@
     </li>
     <li>3 Cup holders</li>
     <li>Superman doors</li>
-    <li>Fuzzy dice!</li>
+    <li>Fuzzy dicel</li>
     <li>
       <button>Own Today</button>
     </li>
@@ -26,7 +27,7 @@
       <div>
         <img src="/images/upgrades/flame.jpg" alt="Flame" />
         <br />
-        <a href="#">Flame Decals</a>
+        <a href="#">Flame Decais</a>
       </div>
     </div>
     <div class="container">

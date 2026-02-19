@@ -4,7 +4,7 @@
     <div class="vehicle-grid">
       <% vehicles.forEach(vehicle => { %>
         <a href="/inv/detail/<%= vehicle.inv_id %>" class="vehicle-card">
-          <img src="<%= vehicle.inv_thumbnail %>" alt="<%= vehicle.inv_make %> <%= vehicle.inv_model %>" class="card-image">
+          <img src="/<%= (vehicle.inv_thumbnail || '/images/vehicles/no-image.png').replace(/^\/+/, '') %>" alt="<%= vehicle.inv_make %> <%= vehicle.inv_model %>" class="card-image" <%= !vehicle.inv_thumbnail || vehicle.inv_thumbnail.includes('no-image') ? 'data-missing="true"' : '' %> onerror="console.log('Image load failed for: ' + this.src)">
           <div class="card-info">
             <h3><%= vehicle.inv_make %> <%= vehicle.inv_model %></h3>
             <p>$<%= Number(vehicle.inv_price).toFixed(2) %></p>

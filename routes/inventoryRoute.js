@@ -1,81 +1,94 @@
-// Needed Resources
 const express = require("express");
-const router = new express.Router();
-const invController = require("../controllers/invController");
+const router = express.Router();
 const utilities = require("../utilities");
-const invValidate = require("../utilities/inventory-validation");
+const inventoryController = require("../controllers/inventoryController");
 
-// Route to build inventory by classification view
+// ===== PUBLIC ROUTES (No authentication required) =====
+
+// Route to build inventory by classification view (public)
 router.get(
-  "/type/:classificationId",
-  utilities.handleErrors(invController.buildByClassificationId),
+  "/type/:classification_id",
+  utilities.handleErrors(inventoryController.buildByClassificationId),
 );
 
-// Route to build vehicle detail view
+// Route to build vehicle detail view (public)
 router.get(
   "/detail/:inv_id",
-  utilities.handleErrors(invController.buildVehicleDetail),
+  utilities.handleErrors(inventoryController.buildVehicleDetail),
 );
 
-// Route to build management view
-router.get("/", utilities.handleErrors(invController.buildManagement));
-
-// Route to build add classification view
-router.get(
-  "/add-classification",
-  utilities.handleErrors(invController.buildAddClassification),
-);
-
-// Route to process add classification
-router.post(
-  "/add-classification",
-  invValidate.classificationRules(),
-  invValidate.checkClassificationData,
-  utilities.handleErrors(invController.addClassification),
-);
-
-// Route to build add inventory view
-router.get(
-  "/add-inventory",
-  utilities.handleErrors(invController.buildAddInventory),
-);
-
-// Route to process add inventory
-router.post(
-  "/add-inventory",
-  invValidate.inventoryRules(),
-  invValidate.checkInventoryData,
-  utilities.handleErrors(invController.addInventory),
-);
-
-// Route to get inventory by classification as JSON (for management page)
+// Route to get inventory JSON (used by management page AJAX)
 router.get(
   "/getInventory/:classification_id",
-  utilities.handleErrors(invController.getInventoryJSON),
+  utilities.handleErrors(inventoryController.getInventoryJSON),
 );
 
-// Route to build edit inventory view
+// ===== ADMIN ROUTES (Employee or Admin only) =====
+
+// FIXED: Management route now has auth
+router.get(
+  "/",
+  utilities.checkLogin,
+  utilities.checkAccountType,
+  utilities.handleErrors(inventoryController.buildManagement),
+);
+
+// FIXED: Using utilities.checkLogin and checkAccountType instead of broken adminAuth
+router.get(
+  "/add-classification",
+  utilities.checkLogin,
+  utilities.checkAccountType,
+  utilities.handleErrors(inventoryController.buildAddClassification),
+);
+
+router.post(
+  "/add-classification",
+  utilities.checkLogin,
+  utilities.checkAccountType,
+  utilities.handleErrors(inventoryController.addClassification),
+);
+
+router.get(
+  "/add-inventory",
+  utilities.checkLogin,
+  utilities.checkAccountType,
+  utilities.handleErrors(inventoryController.buildAddInventory),
+);
+
+router.post(
+  "/add-inventory",
+  utilities.checkLogin,
+  utilities.checkAccountType,
+  utilities.handleErrors(inventoryController.addInventory),
+);
+
 router.get(
   "/edit/:inv_id",
-  utilities.handleErrors(invController.editInventoryView),
+  utilities.checkLogin,
+  utilities.checkAccountType,
+  utilities.handleErrors(inventoryController.editInventoryView),
 );
 
-// Route to process inventory update
+// FIXED: Added missing update route
 router.post(
   "/update",
-  invValidate.inventoryRules(),
-  invValidate.checkUpdateData,
-  utilities.handleErrors(invController.updateInventory),
+  utilities.checkLogin,
+  utilities.checkAccountType,
+  utilities.handleErrors(inventoryController.updateInventory),
 );
 
-// Route to build delete confirmation view
 router.get(
   "/delete/:inv_id",
-  utilities.handleErrors(invController.buildDeleteConfirm),
+  utilities.checkLogin,
+  utilities.checkAccountType,
+  utilities.handleErrors(inventoryController.buildDeleteConfirm),
 );
 
-// Route to process inventory deletion
-router.post("/delete", utilities.handleErrors(invController.executeDelete));
+router.post(
+  "/delete",
+  utilities.checkLogin,
+  utilities.checkAccountType,
+  utilities.handleErrors(inventoryController.executeDelete),
+);
 
-// Export module
 module.exports = router;

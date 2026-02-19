@@ -1,28 +1,23 @@
-/* ******************************************
- * This server.js file is the primary file of the
- * application. It is used to control the project.
- *******************************************/
-const bodyParser = require("body-parser");
 const session = require("express-session");
 const pool = require("./database/");
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
-const env = require("dotenv").config();
-const cookieParser = require("cookie-parser");
+require("dotenv").config();
 const app = express();
 const static = require("./routes/static");
 const baseController = require("./controllers/baseController");
-const inventoryRoute = require("./routes/inventoryRoute");
+const inventoryController = require("./controllers/inventoryController");
+const errorController = require("./controllers/errorController");
 const accountRoute = require("./routes/accountRoute");
 const utilities = require("./utilities");
+const inventoryRoutes = require("./routes/inventoryRoute");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
-/* ***************
+/* ***********************
  * Middleware
- * ****************/
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
-
+ * ************************/
+app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     store: new (require("connect-pg-simple")(session))({
@@ -31,65 +26,72 @@ app.use(
     }),
     secret: process.env.SESSION_SECRET,
     resave: true,
-    saveUninitialized: true,
+    saveUninitialized: false,
     name: "sessionId",
   }),
 );
+app.use(cookieParser());
+// Remove custom JWT middleware
+// app.use((req, res, next) => { ... });
+app.use(utilities.checkJWTToken);
 
 // Express Messages Middleware
 app.use(require("connect-flash")());
 app.use(function (req, res, next) {
-  res.locals.messages = require("express-messages")(req, res);
+  res.locals.messages = req.flash();
   next();
 });
 
-// JWT Token Middleware - runs on every request to set loggedin/accountData locals
-app.use(utilities.checkJWTToken);
-
-/* ***********************
- * View Engine and Templates
- *************************/
+/* View Engine */
 app.set("view engine", "ejs");
 app.use(expressLayouts);
 app.set("layout", "./layouts/layout");
 
-/* ***********************
- * Routes
- *************************/
+/* Routes */
 app.use(static);
-// Index route
+app.use("/account", accountRoute);
 app.get("/", utilities.handleErrors(baseController.buildHome));
-// Inventory routes
-app.use("/inv", inventoryRoute);
-// Account routes
-app.use("/account", require("./routes/accountRoute"));
-// Error testing route
-app.get("/error/test", utilities.handleErrors(baseController.triggerError));
+app.get(
+  "/inv/type/:classification_id",
+  utilities.handleErrors(inventoryController.buildByClassificationId),
+);
+app.get(
+  "/inv/detail/:inv_id",
+  utilities.handleErrors(inventoryController.buildVehicleDetail),
+);
+app.get("/error/test", utilities.handleErrors(errorController.triggerError));
+app.use("/inv", inventoryRoutes);
 
-// File Not Found Route
+// 404 Handler
 app.use(async (req, res, next) => {
   next({ status: 404, message: "Sorry, we appear to have lost that page." });
 });
 
-/* ***********************
- * Express Error Handler
- *************************/
+// Error Handler
 app.use(async (err, req, res, next) => {
-  let nav = await utilities.getNav();
+  let nav;
+  try {
+    nav = await utilities.getNav();
+  } catch (navError) {
+    console.error("Error in getNav:", navError);
+    nav = '<ul><li><a href="/">Home</a></li></ul>';
+  }
   console.error(`Error at: "${req.originalUrl}": ${err.message}`);
   const message =
-    err.status == 404
+    err.status === 404
       ? err.message
-      : "Oh no! There was a crash. Maybe try a different route?";
-  res.render("errors/error", {
+      : "An error has occurred. Please try a different route.";
+  res.status(err.status || 500).render("errors/error", {
     title: err.status || "Server Error",
     message,
     nav,
+    error: process.env.NODE_ENV === "development" ? err : undefined,
   });
 });
 
-const port = process.env.PORT;
-const host = process.env.HOST;
+/* Server */
+const port = process.env.PORT || 5500;
+const host = process.env.HOST || "localhost";
 app.listen(port, () => {
-  console.log(`app listening on ${host}:${port}`);
+  console.log(`App listening on ${host}:${port}`);
 });

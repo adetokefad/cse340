@@ -57,30 +57,53 @@ async function getAccountByEmail(account_email) {
   }
 }
 
+/* *****************************
+ * Return account data using account ID
+ * FIXED: Returns single object, not array
+ * ***************************** */
 async function getAccountById(accountId) {
   try {
     const sql = "SELECT * FROM public.account WHERE account_id = $1";
     const data = await pool.query(sql, [accountId]);
-    return data.rows;
+    return data.rows[0]; // Return single object
   } catch (err) {
     throw new Error("Error fetching account: " + err.message);
   }
 }
 
-async function updateAccount(accountId, { firstName, lastName, email }) {
+/* *****************************
+ * Update account information
+ * FIXED: Takes individual params, not object
+ * FIXED: Uses correct column names with account_ prefix
+ * FIXED: Returns result object
+ * ***************************** */
+async function updateAccount(accountId, firstName, lastName, email) {
   try {
     const sql =
-      "UPDATE public.account SET first_name = $1, last_name = $2, email = $3 WHERE account_id = $4";
-    await pool.query(sql, [firstName, lastName, email, accountId]);
+      "UPDATE public.account SET account_firstname = $1, account_lastname = $2, account_email = $3 WHERE account_id = $4 RETURNING *";
+    const result = await pool.query(sql, [
+      firstName,
+      lastName,
+      email,
+      accountId,
+    ]);
+    return result; // Return result so controller can check rowCount
   } catch (err) {
     throw new Error("Error updating account: " + err.message);
   }
 }
 
+/* *****************************
+ * Update account password
+ * FIXED: Uses correct column name account_password
+ * FIXED: Returns result object
+ * ***************************** */
 async function updatePassword(accountId, hash) {
   try {
-    const sql = "UPDATE public.account SET password = $1 WHERE account_id = $2";
-    await pool.query(sql, [hash, accountId]);
+    const sql =
+      "UPDATE public.account SET account_password = $1 WHERE account_id = $2 RETURNING *";
+    const result = await pool.query(sql, [hash, accountId]);
+    return result; // Return result so controller can check rowCount
   } catch (err) {
     throw new Error("Error updating password: " + err.message);
   }

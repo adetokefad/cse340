@@ -7,6 +7,7 @@ const {
   updateValidation,
   passwordValidation,
 } = require("../middleware/validation");
+const wishlistController = require("../controllers/wishlistController");
 
 router.get(
   "/",
@@ -61,5 +62,25 @@ router.get("/logout", (req, res) => {
     res.redirect("/account/login"); // Redirect to login page
   });
 });
+router.get(
+  "/wishlist",
+  utilities.checkLogin,
+  utilities.handleErrors(wishlistController.buildWishlist),
+);
+router.post(
+  "/wishlist/add",
+  utilities.checkLogin,
+  utilities.handleErrors(wishlistController.addToWishlist),
+);
+router.post(
+  "/wishlist/remove/:inv_id",
+  utilities.checkLogin,
+  utilities.handleErrors(wishlistController.removeFromWishlist),
+);
+router.post(
+  "/wishlist/clear",
+  utilities.checkLogin,
+  utilities.handleErrors(wishlistController.clearWishlist),
+);
 
 module.exports = router;
